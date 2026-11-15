@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasantara Studio — W.I.P.</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Handjet:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg-blue-dark: #165c94;
+      --blue-light: #8cc8e8;
+      --ink-dark: #1d1f23;
+      --pure-white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Handjet', sans-serif;
+      background-color: var(--bg-blue-dark);
+      color: var(--pure-white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-blue-dark);
+    }
+
+    .bg-figma-texture {
+      position: absolute;
+      inset: -2%;
+      width: 104%;
+      height: 104%;
+      background-color: var(--bg-blue-dark);
+      background-image: url('assets/bg.svg');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 1;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .scene-geometry {
+      position: absolute;
+      inset: -1.5%;
+      width: 103%;
+      height: 103%;
+      display: block;
+      z-index: 2;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .film-frame {
+      pointer-events: auto;
+      cursor: pointer;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .film-frame-rect {
+      transition: fill 0.15s ease;
+    }
+
+    .film-frame:hover .film-frame-rect {
+      fill: #e8f6ff;
+    }
+
+    .film-tag {
+      font-family: 'Handjet', sans-serif;
+      font-size: 23px;
+      font-weight: 600;
+      fill: var(--ink-dark);
+      letter-spacing: 0.08em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .film-frame:hover .film-tag {
+      opacity: 1;
+    }
+
+    .foreground-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .interactive {
+      pointer-events: auto;
+    }
+
+    .asset-logo {
+      position: absolute;
+      top: 2.5%;
+      left: 3.9%;
+      width: min(6.6vw, 9.2vh);
+      height: auto;
+      z-index: 6;
+      cursor: pointer;
+    }
+
+    .asset-aksara {
+      position: absolute;
+      top: 5.2%;
+      right: 6.5%;
+      width: min(3.1vw, 4.4vh);
+      height: auto;
+      z-index: 6;
+    }
+
+    .asset-barcode {
+      position: absolute;
+      bottom: 2.1%;
+      left: 1.6%;
+      width: min(17.5vw, 24.5vh);
+      height: auto;
+      z-index: 6;
+      cursor: pointer;
+    }
+
+    .brand-angled {
+      position: absolute;
+      left: -1.6%;
+      top: 53.5%;
+      font-size: clamp(1.8rem, min(4.35vw, 6.1vh), 6rem);
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      line-height: 1;
+      transform: rotate(56deg);
+      transform-origin: center;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-title {
+      position: absolute;
+      left: 16.2%;
+      top: 24.8%;
+      display: flex;
+      font-size: clamp(5.5rem, min(17.6vw, 24.8vh), 22rem);
+      font-weight: 400;
+      line-height: 0.88;
+      letter-spacing: 0.035em;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-char {
+      display: inline-block;
+      will-change: transform;
+    }
+
+    .hero-subtitle {
+      position: absolute;
+      left: 31.6%;
+      top: 50.2%;
+      font-size: clamp(1.6rem, min(4.3vw, 6.05vh), 5.6rem);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0.075em;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+
+    .kinetic-marquee {
+      position: absolute;
+      left: 31.8%;
+      top: 60.4%;
+      width: clamp(230px, 29vw, 450px);
+      height: clamp(26px, 3.2vh, 38px);
+      background-color: var(--ink-dark);
+      border: 2px solid var(--pure-white);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      z-index: 5;
+      user-select: none;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      will-change: transform;
+    }
+
+    .marquee-item {
+      font-size: clamp(0.95rem, 1.35vw, 1.35rem);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--pure-white);
+      padding-right: 1.5rem;
+      white-space: nowrap;
+    }
+
+    .marquee-accent {
+      color: var(--blue-light);
+    }
+
+    .build-status {
+      position: absolute;
+      left: 31.8%;
+      top: 65.4%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: clamp(0.85rem, 1.15vw, 1.2rem);
+      letter-spacing: 0.12em;
+      color: var(--bg-blue-dark);
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .build-bar-outer {
+      width: clamp(110px, 13vw, 200px);
+      height: 8px;
+      border: 1.5px solid var(--bg-blue-dark);
+      background: rgba(255, 255, 255, 0.45);
+      padding: 1px;
+    }
+
+    .build-bar-fill {
+      width: 30%;
+      height: 100%;
+      background-color: var(--bg-blue-dark);
+      transform-origin: left;
+    }
+
+    .loop-gyro {
+      position: absolute;
+      left: 44.5%;
+      top: 71.8%;
+      width: clamp(44px, 4.6vw, 68px);
+      height: clamp(44px, 4.6vw, 68px);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .loop-chevrons {
+      position: absolute;
+      left: 20.5%;
+      top: 63.5%;
+      transform: rotate(51deg);
+      display: flex;
+      gap: 6px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .signal-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 13px;
+      margin-right: 6px;
+    }
+
+    .signal-bar {
+      width: 3px;
+      height: 100%;
+      background-color: var(--pure-white);
+      transform-origin: bottom;
+    }
+
+
+    .contact-info {
+      position: absolute;
+      left: 72.2%;
+      top: 72.8%;
+      font-size: clamp(0.75rem, min(1.06vw, 1.48vh), 1.38rem);
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0.075em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      z-index: 6;
+    }
+
+    .contact-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .contact-wa-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    .social-dock {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--pure-white);
+      text-decoration: none;
+      padding: 2px 8px;
+      background-color: var(--ink-dark);
+      border: 1.5px solid var(--pure-white);
+      border-radius: 3px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .hud-btn svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .hud-btn:hover {
+      background-color: var(--pure-white);
+      color: var(--ink-dark);
+      transform: translateY(-2px);
+    }
+
+
+    .tactical-reticle {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+    }
+
+    .tactical-reticle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--pure-white);
+      border-radius: 3px;
+      -webkit-mask:
+        linear-gradient(#000 0 0) top left / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) top right / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) bottom left / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) bottom right / 8px 8px no-repeat;
+      mask:
+        linear-gradient(#000 0 0) top left / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) top right / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) bottom left / 8px 8px no-repeat,
+        linear-gradient(#000 0 0) bottom right / 8px 8px no-repeat;
+    }
+
+    .tactical-reticle.is-active {
+      width: 48px;
+      height: 48px;
+    }
+
+    @media (hover: none) {
+      .tactical-reticle {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) and (orientation: portrait) {
+      .hero-title {
+        left: 11%;
+        top: 27%;
+        font-size: 23vw;
+      }
+
+      .hero-subtitle {
+        left: 12%;
+        top: 42%;
+        font-size: 7.4vw;
+      }
+
+      .kinetic-marquee {
+        left: 12%;
+        top: 49%;
+        width: 68vw;
+      }
+
+      .build-status,
+      .loop-chevrons {
+        display: none;
+      }
+
+      .loop-gyro {
+        left: 68%;
+        top: 62%;
+      }
+
+      .brand-angled {
+        left: -6%;
+        top: 60%;
+        font-size: 6.2vw;
+      }
+
+      .contact-info {
+        left: auto;
+        right: 4%;
+        top: auto;
+        bottom: 13%;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+
+    <div class="bg-figma-texture" id="bgTexture"></div>
+
+    <svg
+      class="scene-geometry"
+      id="sceneGeo"
+      viewBox="0 0 1440 1024"
+      preserveAspectRatio="none"
+    >
+      <defs>
+
+        <pattern
+          id="filmLines"
+          width="10"
+          height="11"
+          patternUnits="userSpaceOnUse"
+        >
+          <rect width="10" height="6.5" fill="#1d1f23" />
+          <rect y="6.5" width="10" height="4.5" fill="#272a30" />
+        </pattern>
+      </defs>
+
+      <path
+        id="mainBlueShape"
+        fill="#8cc8e8"
+        d="
+          M 0 28
+          L 165 158
+          L 354 11
+          Q 376 -5 394 17
+          L 632 325
+          L 1360 325
+          L 1360 865
+          L 574 865
+          Q 552 865 538 846
+          L 135 338
+          L 38 376
+          L 292 732
+          Q 305 753 280 752
+          L 0 737
+          Z
+        "
+      />
+
+      <path
+        id="topRightShape"
+        fill="#8cc8e8"
+        d="M 1293 0 L 1440 0 L 1440 306 L 1252 385 Z"
+      />
+
+      <g id="filmTrack" transform="translate(475, 0) rotate(34.05)">
+        <rect
+          x="-140"
+          y="-205"
+          width="1620"
+          height="205"
+          fill="url(#filmLines)"
+        />
+
+        <g class="film-frame hover-target">
+          <rect class="film-frame-rect" x="65" y="-171.5" width="215" height="138" rx="12" fill="#ffffff" />
+          <text class="film-tag" x="172.5" y="-96" text-anchor="middle">01 // STUDIO</text>
+        </g>
+
+        <a href="https://www.instagram.com/kasantaraproject?srtk=MXcxZXV5Mmh3ZDRiMQ==" target="_blank" rel="noopener">
+          <g class="film-frame hover-target">
+            <rect class="film-frame-rect" x="330" y="-171.5" width="215" height="138" rx="12" fill="#ffffff" />
+            <text class="film-tag" x="437.5" y="-96" text-anchor="middle">02 // INSTAGRAM ↗</text>
+          </g>
+        </a>
+
+        <a href="https://www.tiktok.com/@kasantaraproject" target="_blank" rel="noopener">
+          <g class="film-frame hover-target">
+            <rect class="film-frame-rect" x="595" y="-171.5" width="215" height="138" rx="12" fill="#ffffff" />
+            <text class="film-tag" x="702.5" y="-96" text-anchor="middle">03 // TIKTOK ↗</text>
+          </g>
+        </a>
+
+        <g class="film-frame hover-target">
+          <rect class="film-frame-rect" x="860" y="-171.5" width="215" height="138" rx="12" fill="#ffffff" />
+          <text class="film-tag" x="967.5" y="-96" text-anchor="middle">04 // CREATIVE</text>
+        </g>
+
+        <g class="film-frame hover-target">
+          <rect class="film-frame-rect" x="1125" y="-171.5" width="215" height="138" rx="12" fill="#ffffff" />
+          <text class="film-tag" x="1232.5" y="-96" text-anchor="middle">05 // W.I.P.</text>
+        </g>
+      </g>
+
+      <path
+        id="bottomRibbon"
+        fill="#8cc8e8"
+        d="M 352 1024 L 1440 832 L 1440 1024 Z"
+      />
+
+      <g id="bottomShards">
+        <path
+          fill="#ffffff"
+          d="
+            M 640 1024
+            L 640 1012
+            Q 640 996 658 992
+            L 1018 932
+            Q 1044 928 1036 952
+            L 1010 1024
+            Z
+          "
+        />
+        <path
+          fill="#ffffff"
+          d="
+            M 1032 1024
+            L 1064 942
+            Q 1076 922 1094 942
+            L 1168 1024
+            Z
+          "
+        />
+        <path
+          fill="#ffffff"
+          d="
+            M 1192 1024
+            L 1116 942
+            Q 1100 924 1124 920
+            L 1440 866
+            L 1440 1024
+            Z
+          "
+        />
+      </g>
+    </svg>
+
+    <div class="foreground-layer" id="fgLayer">
+
+      <img
+        src="assets/logo.svg"
+        alt="Kasantara Logo"
+        class="asset-logo interactive hover-target gsap-pop"
+        id="brandLogo"
+      />
+
+      <img
+        src="assets/aksara-sunda.svg"
+        alt="Aksara Sunda Kasantara"
+        class="asset-aksara gsap-pop"
+      />
+
+      <div class="brand-angled" id="brandAngled">KASANTARA</div>
+
+      <h1 class="hero-title interactive hover-target" id="heroTitle">
+        <span class="hero-char">W</span>
+        <span class="hero-char">.</span>
+        <span class="hero-char">I</span>
+        <span class="hero-char">.</span>
+        <span class="hero-char">P</span>
+        <span class="hero-char">.</span>
+      </h1>
+
+      <!-- Subjudul WORK IN PROGRES -->
+      <p class="hero-subtitle" id="heroSubtitle">WORK IN PROGRES</p>
+
+      <div class="kinetic-marquee gsap-pop" aria-hidden="true">
+        <div class="marquee-track" id="marqueeTrack">
+          <span class="marquee-item">
+            <span class="marquee-accent">//</span> KASANTARA STUDIO
+            <span class="marquee-accent">//</span> @KASANTARAPROJECT
+            <span class="marquee-accent">//</span> UNDER CONSTRUCTION
+          </span>
+          <span class="marquee-item">
+            <span class="marquee-accent">//</span> KASANTARA STUDIO
+            <span class="marquee-accent">//</span> @KASANTARAPROJECT
+            <span class="marquee-accent">//</span> UNDER CONSTRUCTION
+          </span>
+        </div>
+      </div>
+
+      <div class="build-status gsap-pop" aria-hidden="true">
+        <span>SYS.BUILD</span>
+        <div class="build-bar-outer">
+          <div class="build-bar-fill" id="buildFill"></div>
+        </div>
+        <span>30%</span>
+      </div>
+
+      <svg
+        class="loop-gyro gsap-pop"
+        id="loopGyro"
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+      >
+        <circle
+          cx="50"
+          cy="50"
+          r="42"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="3"
+          stroke-dasharray="18 10"
+        />
+        <g id="gyroInner">
+          <polygon
+            points="50,16 58,42 84,50 58,58 50,84 42,58 16,50 42,42"
+            fill="#165c94"
+          />
+          <circle cx="50" cy="50" r="6" fill="#ffffff" />
+        </g>
+      </svg>
+
+      <div class="loop-chevrons gsap-pop" aria-hidden="true">
+        <svg class="chevron-item" width="18" height="24" viewBox="0 0 18 24">
+          <polygon points="0,0 8,0 18,12 8,24 0,24 10,12" fill="#165c94" />
+        </svg>
+        <svg class="chevron-item" width="18" height="24" viewBox="0 0 18 24">
+          <polygon points="0,0 8,0 18,12 8,24 0,24 10,12" fill="#ffffff" />
+        </svg>
+        <svg class="chevron-item" width="18" height="24" viewBox="0 0 18 24">
+          <polygon points="0,0 8,0 18,12 8,24 0,24 10,12" fill="#165c94" />
+        </svg>
+        <svg class="chevron-item" width="18" height="24" viewBox="0 0 18 24">
+          <polygon points="0,0 8,0 18,12 8,24 0,24 10,12" fill="#ffffff" />
+        </svg>
+      </div>
+
+      <div class="contact-info interactive" id="contactInfo">
+        <div class="contact-header">
+          <span class="signal-bars" aria-hidden="true">
+            <span class="signal-bar"></span>
+            <span class="signal-bar"></span>
+            <span class="signal-bar"></span>
+            <span class="signal-bar"></span>
+          </span>
+          <span>WANT MORE INFORMATION ABOUT US ?</span>
+        </div>
+
+        <div class="contact-wa-row">
+          <span>CONTACT US:</span>
+          <a
+            href="https://wa.me/62882000486266"
+            target="_blank"
+            rel="noopener"
+            class="hud-btn hover-target"
+          >
+            +62 882 000 486 266
+          </a>
+        </div>
+
+        <div class="social-dock">
+
+          <a
+            href="https://www.instagram.com/kasantaraproject?srtk=MXcxZXV5Mmh3ZDRiMQ=="
+            target="_blank"
+            rel="noopener"
+            class="hud-btn hover-target"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2zm-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6zm9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25zM12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+            </svg>
+            <span>INSTAGRAM</span>
+          </a>
+
+          <a
+            href="https://www.tiktok.com/@kasantaraproject"
+            target="_blank"
+            rel="noopener"
+            class="hud-btn hover-target"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+            </svg>
+            <span>TIKTOK</span>
+          </a>
+        </div>
+      </div>
+
+      <img
+        src="assets/barcode.svg"
+        alt="Kasantara Studio Barcode"
+        class="asset-barcode interactive hover-target gsap-pop"
+        id="brandBarcode"
+      />
+    </div>
+
+    <div class="tactical-reticle" id="reticle" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+
+      gsap.set('#mainBlueShape', { opacity: 0, scale: 0.96, transformOrigin: 'center' });
+      gsap.set(['#topRightShape', '#bottomRibbon', '#bottomShards'], { opacity: 0, y: 20 });
+      gsap.set('#filmTrack', { x: 475 - 260, y: -176, rotation: 34.05, opacity: 0 });
+      gsap.set('.film-frame', { scale: 0.65, opacity: 0 });
+      gsap.set('.hero-char', { y: 40, opacity: 0, rotation: -5 });
+      gsap.set('#heroSubtitle', { x: -24, opacity: 0 });
+      gsap.set('#brandAngled', { x: -30, opacity: 0, rotation: 56 });
+      gsap.set('.gsap-pop', { scale: 0.78, opacity: 0 });
+      gsap.set('#contactInfo', { y: 16, opacity: 0 });
+
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+
+      tl.to('#mainBlueShape', {
+        opacity: 1,
+        scale: 1,
+        duration: 0.9
+      })
+      .to(['#topRightShape', '#bottomRibbon', '#bottomShards'], {
+        opacity: 1,
+        y: 0,
+        duration: 0.75,
+        stagger: 0.08
+      }, '-=0.75')
+      .to('#filmTrack', {
+        x: 475,
+        y: 0,
+        opacity: 1,
+        duration: 0.85,
+        ease: 'power4.out'
+      }, '-=0.65')
+      .to('.film-frame', {
+        scale: 1,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.06,
+        ease: 'back.out(1.8)'
+      }, '-=0.45')
+      .to('.hero-char', {
+        y: 0,
+        opacity: 1,
+        rotation: 0,
+        duration: 0.6,
+        stagger: 0.05,
+        ease: 'back.out(1.7)'
+      }, '-=0.5')
+      .to('#heroSubtitle', {
+        x: 0,
+        opacity: 1,
+        duration: 0.6
+      }, '-=0.4')
+      .to('#brandAngled', {
+        x: 0,
+        opacity: 1,
+        duration: 0.6
+      }, '-=0.55')
+      .to('.gsap-pop', {
+        scale: 1,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: 'back.out(1.6)'
+      }, '-=0.45')
+      .to('#contactInfo', {
+        y: 0,
+        opacity: 1,
+        duration: 0.5
+      }, '-=0.35');
+
+      gsap.to('#marqueeTrack', {
+        xPercent: -50,
+        duration: 13,
+        repeat: -1,
+        ease: 'none'
+      });
+
+      gsap.to('#loopGyro', {
+        rotation: 360,
+        duration: 20,
+        repeat: -1,
+        ease: 'none'
+      });
+
+      gsap.to('#gyroInner', {
+        rotation: -360,
+        transformOrigin: '50% 50%',
+        duration: 12,
+        repeat: -1,
+        ease: 'none'
+      });
+
+      gsap.fromTo(
+        '.chevron-item',
+        { opacity: 0.25, x: -6 },
+        {
+          opacity: 1,
+          x: 6,
+          duration: 0.55,
+          stagger: 0.12,
+          repeat: -1,
+          yoyo: true,
+          ease: 'power1.inOut'
+        }
+      );
+
+      gsap.to('.signal-bar', {
+        scaleY: () => gsap.utils.random(0.25, 1),
+        duration: 0.32,
+        stagger: {
+          each: 0.08,
+          repeat: -1,
+          yoyo: true
+        },
+        ease: 'steps(3)'
+      });
+
+      gsap.to('#buildFill', {
+        scaleX: 0.94,
+        duration: 1.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+
+      gsap.to('#brandLogo', {
+        y: -5,
+        duration: 2.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+
+      document.querySelectorAll('.film-frame').forEach((frame) => {
+        frame.addEventListener('mouseenter', () => {
+          gsap.to(frame, { scale: 1.06, duration: 0.28, ease: 'back.out(2)' });
+        });
+        frame.addEventListener('mouseleave', () => {
+          gsap.to(frame, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        });
+      });
+
+      document.getElementById('heroTitle').addEventListener('click', () => {
+        gsap.fromTo(
+          '.hero-char',
+          { y: -16, scale: 1.06 },
+          {
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.04,
+            ease: 'elastic.out(1, 0.4)'
+          }
+        );
+      });
+
+      document.getElementById('brandLogo').addEventListener('click', () => {
+        gsap.fromTo(
+          '#brandLogo',
+          { rotation: -14, scale: 0.88 },
+          { rotation: 0, scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.35)' }
+        );
+        gsap.to('.film-frame', {
+          scale: 1.08,
+          duration: 0.2,
+          stagger: { each: 0.06, yoyo: true, repeat: 1 },
+          ease: 'power2.inOut'
+        });
+      });
+
+      const texX = gsap.quickTo('#bgTexture', 'x', { duration: 0.95, ease: 'power3.out' });
+      const texY = gsap.quickTo('#bgTexture', 'y', { duration: 0.95, ease: 'power3.out' });
+      const geoX = gsap.quickTo('#sceneGeo', 'x', { duration: 0.8, ease: 'power3.out' });
+      const geoY = gsap.quickTo('#sceneGeo', 'y', { duration: 0.8, ease: 'power3.out' });
+      const fgX = gsap.quickTo('#fgLayer', 'x', { duration: 0.65, ease: 'power3.out' });
+      const fgY = gsap.quickTo('#fgLayer', 'y', { duration: 0.65, ease: 'power3.out' });
+
+      const reticle = document.getElementById('reticle');
+      const retX = gsap.quickTo(reticle, 'left', { duration: 0.16, ease: 'power2.out' });
+      const retY = gsap.quickTo(reticle, 'top', { duration: 0.16, ease: 'power2.out' });
+
+      window.addEventListener('mousemove', (e) => {
+        const normX = (e.clientX / window.innerWidth - 0.5) * 2;
+        const normY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+        texX(-normX * 6);
+        texY(-normY * 5);
+        geoX(-normX * 12);
+        geoY(-normY * 9);
+        fgX(normX * 15);
+        fgY(normY * 11);
+
+        reticle.style.opacity = '1';
+        retX(e.clientX);
+        retY(e.clientY);
+      });
+
+      document.querySelectorAll('.hover-target').forEach((el) => {
+        el.addEventListener('mouseenter', () => reticle.classList.add('is-active'));
+        el.addEventListener('mouseleave', () => reticle.classList.remove('is-active'));
+      });
+    });
+  </script>
+</body>
+</html>
